@@ -92,8 +92,18 @@ typedef struct
     } hook_data;
 } Service;
 
+typedef enum
+{
+    FIELD_DATA_TYPE_INVALID=-1,
+    FIELD_DATA_TYPE_SERVICE_PROFILE,
+    FIELD_DATA_TYPE_STRING,
+    FIELD_DATA_TYPE_BYTES,
+    FIELD_DATA_TYPE_COUNT
+} FieldDataType;
+
 typedef struct
 {
+    FieldDataType type;
     union
     {
         // social media sites usually store an @ name and an internal id
@@ -103,10 +113,11 @@ typedef struct
             StringData*  pubname;
             StringData*  pubid;
         } service_profile;
-        StringData* value;
-        void* raw_data;
+        StringData* string;
+        byte* bytes;
     } value;
-} FieldContact;
+    void* raw_data;
+} FieldData;
 
 
 typedef u128 Tag;
@@ -126,8 +137,7 @@ typedef struct
     u32             contact_count;
     u32             contact_allocated;
     String*         c_ids;
-    u32*            c_field_counts;
-    FieldContact**  c_field_data;
+    FieldData**     c_fields_data;
     Tag*            c_tags;
 } Database;
 
