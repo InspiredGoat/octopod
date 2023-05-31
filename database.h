@@ -14,6 +14,15 @@ typedef unsigned int        u32;
 typedef unsigned long       u64;
 typedef __uint128_t         u128; // TODO: check this is portable
 
+#ifndef __cplusplus
+#ifndef bool
+typedef unsigned char bool;
+#endif
+#endif
+
+#define TRUE  1
+#define FALSE 0
+
 
 typedef struct
 {
@@ -67,7 +76,7 @@ typedef struct
         struct
         {
             String program;
-            String argument_count;
+            u32 argument_count;
             String* arguments;
         } program;
         struct
@@ -80,8 +89,17 @@ typedef struct
 typedef struct
 {
     FieldId id;
-    String  pubname;
-    String  pubid;
+    union
+    {
+        // social media sites usually store an @ name and an internal id
+        // to interface with these sites we need both the @ and the id
+        struct
+        {
+            String  pubname;
+            String  pubid;
+        } service_profile;
+        String value;
+    } value;
 } FieldContact;
 
 
@@ -90,6 +108,7 @@ typedef u128 Tag;
 // Database is set up as a structure of arrays
 typedef struct
 {
+    String passkey;
     String tags[sizeof(Tag) * 8]; // 128 possible tags
 
     u32             field_count;
@@ -99,21 +118,27 @@ typedef struct
     Service*        services;
 
     u32             contact_count;
+    u32             contact_allocated;
+    String*         c_ids;
     int*            c_field_counts;
     FieldContact**  c_field_ids;
     Tag*            c_tags;
 } Database;
 
-void db_load(char* filename, char* passkey);
-void db_encrypt(char* passkey);
-void db_save();
+void db_init(void);
+void db_create(void);
+void db_load(char* filename, String passkey);
+void db_encrypt(String passkey);
+void db_save(char* filename);
+void db_uninit(void);
 
-void db_contact_add(char* name_id);
-void db_contact_set(char* name_id);
-void db_contact_remove(char* name_id);
+void db_contact_add(String name_id);
+// string value is copied into database, feel free to free after
+void db_contact_set(String name_id, FieldId field, String value);
+void db_contact_remove(String name_id);
 
-String db_search(String query, FieldId field);
-String db_search_multiple(String query, FieldId* fields, u32 field_count);
+void db_search(String query, FieldId field);
+void db_search_multi(String query, FieldId* fields, u32 field_count);
 
 
 //------------------------------------------------------------
