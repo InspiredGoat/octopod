@@ -116,7 +116,8 @@ typedef struct
         StringData* string;
         byte* bytes;
     } value;
-    void* raw_data;
+    u32     data_size;
+    void*   data_raw;
 } FieldData;
 
 
@@ -137,19 +138,21 @@ typedef struct
     u32             contact_count;
     u32             contact_allocated;
     String*         c_ids;
-    FieldData**     c_fields_data;
     Tag*            c_tags;
+    FieldData**     c_fields_data;
 } Database;
 
 void db_init(void);
 void db_create(void);
+void db_field_add(void);
+void db_service_add(void);
 void db_load(char* filename, String passkey);
 void db_encrypt(String passkey);
 void db_save(char* filename);
 void db_uninit(void);
 
 void db_contact_add(String id);
-// string value is copied into database, feel free to free after
+// value is copied, free it on your end
 void db_contact_field_set(String id, FieldId field, void* value, u32 value_size);
 
 void db_contact_tag_set(String id, Tag tags);
