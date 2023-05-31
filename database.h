@@ -30,6 +30,12 @@ typedef struct
     char* data;
 } String;
 
+typedef struct
+{
+    u32 length;
+    char data[];
+} StringData;
+
 
 typedef enum
 {
@@ -49,7 +55,7 @@ typedef enum
     FIELD_COUNT
 } FieldType;
 
-typedef String FieldId;
+typedef u32 FieldId;
 
 typedef struct
 {
@@ -88,17 +94,17 @@ typedef struct
 
 typedef struct
 {
-    FieldId id;
     union
     {
         // social media sites usually store an @ name and an internal id
         // to interface with these sites we need both the @ and the id
         struct
         {
-            String  pubname;
-            String  pubid;
+            StringData*  pubname;
+            StringData*  pubid;
         } service_profile;
-        String value;
+        StringData* value;
+        void* raw_data;
     } value;
 } FieldContact;
 
@@ -120,8 +126,8 @@ typedef struct
     u32             contact_count;
     u32             contact_allocated;
     String*         c_ids;
-    int*            c_field_counts;
-    FieldContact**  c_field_ids;
+    u32*            c_field_counts;
+    FieldContact**  c_field_data;
     Tag*            c_tags;
 } Database;
 
@@ -132,9 +138,11 @@ void db_encrypt(String passkey);
 void db_save(char* filename);
 void db_uninit(void);
 
-void db_contact_add(String name_id);
+void db_contact_add(String id);
 // string value is copied into database, feel free to free after
-void db_contact_set(String name_id, FieldId field, String value);
+void db_contact_field_set(String id, FieldId field, void* value, u32 value_size);
+
+void db_contact_tag_set(String id, Tag tags);
 void db_contact_remove(String name_id);
 
 void db_search(String query, FieldId field);
