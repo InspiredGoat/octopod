@@ -143,13 +143,15 @@ typedef struct
 } Database;
 
 void db_init(void);
+void db_uninit(void);
 void db_create(void);
+
 void db_field_add(void);
 void db_service_add(void);
+
 void db_load(char* filename, String passkey);
 void db_encrypt(String passkey);
 void db_save(char* filename);
-void db_uninit(void);
 
 void db_contact_add(String id);
 // value is copied, free it on your end
