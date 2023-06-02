@@ -132,3 +132,15 @@ service:
     hook_type: dll
     hook_file: urbit.dll
 ```
+
+
+
+# TODO:
+    - add/remove fields
+    - add/remove services
+    - add/remove tag names
+    - get tag names
+    - load database
+    - basic encryption
+    - request fields
+    - queue fields

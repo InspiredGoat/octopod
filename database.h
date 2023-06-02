@@ -158,6 +158,9 @@ void db_contact_field_set(String id, FieldId field, void* value, u32 value_size)
 void db_contact_tag_set(String id, Tag tags);
 void db_contact_remove(String name_id);
 
+Tag db_contact_tag_get(String name_id);
+FieldData* db_contact_field_get_all(String name_id);
+
 void db_search(String query, FieldId field);
 void db_search_multi(String query, FieldId* fields, u32 field_count);
 
