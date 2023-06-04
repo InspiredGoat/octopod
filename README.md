@@ -135,12 +135,24 @@ service:
 
 
 
-# TEST:
-    - add/remove tag names
+# DONE:
     - get tag names
+    - set tags
+    - add fields
+    - set fields
+    - create db
+    - save db
+# TEST:
+    - remove contact
+    - request fields
+    - add/remove tag names
+    - scratch allocator works properly
 # TODO:
-    - add/remove fields
+    - request particular field
+    - search by field
+    - search by tag
     - load database
     - basic encryption
-    - request fields
     - queue fields
+# BUGS:
+    - scratch_alloc not working properly

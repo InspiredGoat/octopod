@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <cmocka.h>
 
 #include <string.h>
@@ -43,7 +44,7 @@ static void test_add_contacts(void **state)
     db_uninit();
 }
 
-static void test_checkfields(void **state)
+static void test_setfields(void **state)
 {
     db_init();
     db_create();
@@ -54,36 +55,69 @@ static void test_checkfields(void **state)
     db_header_add_field("Last Name",    FIELD_TYPE_STRING);
     db_header_add_field("Phone Number", FIELD_TYPE_STRING);
     db_header_add_field("Facebook",     FIELD_TYPE_SERVICE_PROFILE);
-
-    db_header_add_tag(cstr_to_string("stranger"));
-    db_header_add_tag(cstr_to_string("friend"));
-    db_header_add_tag(cstr_to_string("family"));
-    db_header_add_tag(cstr_to_string("coworker"));
-    db_header_add_tag(cstr_to_string("infidel"));
-
     db_header_end();
 
     String c1 = cstr_to_string("richard");
     db_contact_add(c1);
     db_contact_add(cstr_to_string("bob"));
 
-    db_contact_tag_set(c1, 0xffffffffffffffff);
+    db_contact_tag_set(c1, 0xffff);
     FieldData* fields = db_contact_field_get_all(c1);
 
     db_contact_field_set_string(c1, 0, cstr_to_string("Richard"));
     db_contact_field_set_string(c1, 1, cstr_to_string("Lennox"));
-    /* for (int i = 0; i < ) */
-    /* { */
-        
-    /* } */
 
     FieldData* data = db_contact_field_get_all(cstr_to_string("richard"));
-
-    assert_string_equal(data[0].value.string->data, "Richard");
-    assert_string_equal(data[1].value.string->data, "Lennox");
-
+    assert_false(strncmp(data[0].value.string->data, "Richard", strlen("Richard")));
+    assert_false(strncmp(data[1].value.string->data, "Lennox",  strlen("Lennox")));
 
     db_save("out.db");
+
+    db_uninit();
+}
+
+static void test_tags(void** state)
+{
+    db_init();
+    db_create();
+
+    db_header_begin();
+
+    db_header_add_tag("stranger");
+    db_header_add_tag("doctor");
+    db_header_add_tag("friend");
+    db_header_add_tag("family");
+    db_header_add_tag("coworker");
+    db_header_add_tag("infidel");
+
+    db_header_end();
+
+    String c1 = cstr_to_string("richard");
+    db_contact_add(c1);
+
+    db_contact_tag_set(c1, 0b111101);
+    Tag t = db_contact_tag_get(c1);
+
+    // he's tagged with everything except for doctor
+    char* correct_tags[] = 
+    {
+        "stranger",
+        NULL,
+        "friend",
+        "family",
+        "coworker",
+        "infidel"
+    };
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (t & (1 << i))
+        {
+            char* name = db_tag_get((1 << i));
+
+            assert_string_equal(name, correct_tags[i]);
+        }
+    }
 
     db_uninit();
 }
@@ -95,10 +129,10 @@ int main()
     const struct CMUnitTest tests[] =
     {
         cmocka_unit_test(test_add_contacts),
-        cmocka_unit_test(test_checkfields),
+        cmocka_unit_test(test_setfields),
+        cmocka_unit_test(test_tags),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
-
 

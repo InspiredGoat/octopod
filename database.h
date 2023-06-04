@@ -69,6 +69,8 @@ typedef enum
     FIELD_TYPE_INVALID=-1,
     FIELD_TYPE_STRING,
     FIELD_TYPE_SERVICE_PROFILE,
+    FIELD_TYPE_U32,
+    FIELD_TYPE_I32,
     FIELD_TYPE_BYTES,
     FIELD_TYPE_COUNT
 } FieldType;
@@ -116,6 +118,8 @@ typedef struct
         } service_profile;
         StringData* string;
         byte* bytes;
+        u32* u;
+        i32* i;
     } value;
     u32     data_size;
     void*   data_raw;
@@ -129,7 +133,7 @@ void db_create(void);
 
 // reset database header
 void db_header_begin(void);
-void db_header_add_tag(String name);
+void db_header_add_tag(char* name);
 void db_header_add_field(char* name, FieldType type);
 void db_header_add_field_hook_web(char* name, FieldType type, char* dm_url, char* feed_url);
 void db_header_add_field_hook_script(char* name, FieldType type, char* dm_script, char* feed_script);
@@ -143,7 +147,9 @@ char* db_tag_get(Tag bitmask);
 void db_load(char* filename, String passkey);
 void db_encrypt(String passkey);
 void db_save(char* filename);
+
 void db_contact_add(String id);
+void db_contact_remove(String name_id);
 
 u32 db_fields_count(void);
 
@@ -152,10 +158,7 @@ void db_contact_field_set(String id, FieldId field, void* value, u32 value_size)
 /* void db_contact_field_set(String id, FieldId field, FieldType type, void* value, u32 value_size); */
 void db_contact_field_set_string(String id, FieldId field, String str);
 
-// gets every tag
-Tag  db_contact_tags_get(String id);
 void db_contact_tag_set(String id, Tag tags);
-void db_contact_remove(String name_id);
 
 Tag db_contact_tag_get(String name_id);
 FieldData* db_contact_field_get_all(String name_id);

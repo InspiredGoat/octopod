@@ -74,9 +74,9 @@ void db_header_add_field(char* name, FieldType type)
     db.fields[db.field_count].hook_type = HOOK_TYPE_NONE;
     db.field_count++;
 }
-void db_header_add_tag(String name)
+void db_header_add_tag(char* name)
 {
-    memcpy(db.tags[(1 << db.tag_count)], name.data, min(DB_MAX_TAG_STR_SIZE, name.length));
+    strncpy(db.tags[db.tag_count], name, min(DB_MAX_TAG_STR_SIZE, strlen(name)));
 
     db.tag_count ++;
 
@@ -176,7 +176,21 @@ void db_contact_add(String id)
     }
     
 }
-void db_contact_remove(String name_id);
+void db_contact_remove(String id)
+{
+    u32 index = db_index_from_id(id);
+    if (index == INVALID_INDEX)
+    {
+        printf("Name not in database\n");
+        assert(0);
+    }
+
+    memmove(db.c_fields_data + index,
+            db.c_fields_data + index + 1,
+            sizeof(FieldData) * (db.contact_count - index - 1));
+
+    db.contact_count --;
+}
 
 void db_contact_tag_set(String id, Tag tags)
 {
@@ -254,13 +268,20 @@ void db_contact_field_set(String id, FieldId field, void* value, u32 value_size)
             case FIELD_TYPE_BYTES:
                 fields[index][field].value.bytes = fields[index][field].data_raw;
                 break;
+            case FIELD_TYPE_U32:
+                fields[index][field].value.u = ((u32*)fields[index][field].data_raw);
+                break;
+            case FIELD_TYPE_I32:
+                fields[index][field].value.i = ((i32*)fields[index][field].data_raw);
+                break;
         }
     }
 }
 
 void db_contact_field_set_string(String id, FieldId field, String str)
 {
-    db_contact_field_set(id, field, str.data, str.length);
+    StringData* data = string_to_stringdata(str);
+    db_contact_field_set(id, field, data, sizeof(StringData) + str.length);
 }
 
 

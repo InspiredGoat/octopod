@@ -32,8 +32,7 @@ void* db_scratch_alloc(u64 size)
         scratch_off += size;
     }
 
-    /* return scratch_mem + scratch_off; */
-    return malloc(size);
+    return scratch_mem + scratch_off;
 }
 
 
@@ -71,7 +70,7 @@ void* db_arena_calloc(u64 size, u64 count)
     if (ptr != NULL)
     {
         bzero(ptr, size * count);
-    } 
+    }
 
     return ptr;
 }

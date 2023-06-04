@@ -26,7 +26,7 @@ typedef struct
     // --- header start ---
     char passkey[DB_MAX_PWD_STR_SIZE];
 
-    char tags[DB_MAX_TAG_STR_SIZE][sizeof(Tag) * 8]; // 128 possible tags
+    char tags[sizeof(Tag) * 8][DB_MAX_TAG_STR_SIZE]; // 128 possible tags
     u32  tag_count;
 
     u32             field_count;
@@ -34,11 +34,13 @@ typedef struct
 
     // ---  header end  ---
 
+    // --- contact stuff ---
     u32             contact_count;
     u32             contact_allocated;
     String*         c_ids;
     Tag*            c_tags;
     FieldData**     c_fields_data;
+    // ---  contact end  ---
 } Database;
 
 extern Database db;
