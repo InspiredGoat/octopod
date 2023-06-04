@@ -1,4 +1,4 @@
-# 
+# Octopod
 ## (Taking suggestions for better name)
 
 # ⚠️⚠️ NOT FINISHED USE AT YOUR OWN RISK ⚠️⚠️
@@ -135,11 +135,11 @@ service:
 
 
 
-# TODO:
-    - add/remove fields
-    - add/remove services
+# TEST:
     - add/remove tag names
     - get tag names
+# TODO:
+    - add/remove fields
     - load database
     - basic encryption
     - request fields

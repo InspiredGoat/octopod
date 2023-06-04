@@ -23,6 +23,12 @@ typedef unsigned char bool;
 #define TRUE  1
 #define FALSE 0
 
+#define DB_MAX_CID_STR_SIZE 128
+#define DB_MAX_TAG_STR_SIZE 128
+#define DB_MAX_PWD_STR_SIZE 128
+#define DB_MAX_URL_STR_SIZE 1024
+#define DB_MAX_FIELD_STR_SIZE 128
+
 
 typedef struct
 {
@@ -40,6 +46,7 @@ typedef struct
 typedef enum
 {
     HOOK_TYPE_INVALID=-1,
+    HOOK_TYPE_NONE,
     HOOK_TYPE_WEB,
     HOOK_TYPE_SCRIPT,
     HOOK_TYPE_PROGRAM,
@@ -47,63 +54,57 @@ typedef enum
     HOOK_TYPE_COUNT
 } HookType;
 
-typedef enum
-{
-    FIELD_INVALID=-1,
-    FIELD_INFO,
-    FIELD_SERVICE,
-    FIELD_COUNT
-} FieldType;
+/* typedef enum */
+/* { */
+/*     FIELD_INVALID=-1, */
+/*     FIELD_INFO, */
+/*     FIELD_SERVICE, */
+/*     FIELD_COUNT */
+/* } FieldType; */
 
 typedef u32 FieldId;
 
-typedef struct
+typedef enum
 {
-    FieldId field_id;   // backend id
-    String  field_name; // for rendering purposes so 'Twitter', 'Facebook', 'Telegram'
-} FieldInfo;
+    FIELD_TYPE_INVALID=-1,
+    FIELD_TYPE_STRING,
+    FIELD_TYPE_SERVICE_PROFILE,
+    FIELD_TYPE_BYTES,
+    FIELD_TYPE_COUNT
+} FieldType;
 
-typedef struct 
+typedef struct FieldInfo
 {
-    FieldInfo info;
+    char  field_name[DB_MAX_FIELD_STR_SIZE]; // for rendering purposes so 'Twitter', 'Facebook', 'Telegram'
+    FieldType type;
     HookType hook_type;
+
     union
     {
         struct
         {
-            String      dm_url;       // url template for instant messaging
-            String      feed_url;     // url template to check their "content" (ie their Twitter feed)
+            char      dm_url[DB_MAX_URL_STR_SIZE];       // url template for instant messaging
+            char      feed_url[DB_MAX_URL_STR_SIZE];     // url template to check their "content" (ie their Twitter feed)
         } web;
         struct
         {
-            String dm_script;
-            String feed_script;
+            char dm_script[DB_MAX_URL_STR_SIZE];
+            char feed_script[DB_MAX_URL_STR_SIZE];
         } script;
         struct
         {
-            String program;
-            u32 argument_count;
-            String* arguments;
+            char program_cmd[DB_MAX_URL_STR_SIZE];
         } program;
         struct
         {
             // TODO: find way to implement
         } dll;
     } hook_data;
-} Service;
-
-typedef enum
-{
-    FIELD_DATA_TYPE_INVALID=-1,
-    FIELD_DATA_TYPE_SERVICE_PROFILE,
-    FIELD_DATA_TYPE_STRING,
-    FIELD_DATA_TYPE_BYTES,
-    FIELD_DATA_TYPE_COUNT
-} FieldDataType;
+} FieldInfo;
 
 typedef struct
 {
-    FieldDataType type;
+    FieldType type;
     union
     {
         // social media sites usually store an @ name and an internal id
@@ -120,43 +121,39 @@ typedef struct
     void*   data_raw;
 } FieldData;
 
-
 typedef u128 Tag;
-
-// Database is set up as a structure of arrays
-typedef struct
-{
-    String passkey;
-    String tags[sizeof(Tag) * 8]; // 128 possible tags
-
-    u32             field_count;
-    FieldInfo*      fields;
-
-    u32             service_count;
-    Service*        services;
-
-    u32             contact_count;
-    u32             contact_allocated;
-    String*         c_ids;
-    Tag*            c_tags;
-    FieldData**     c_fields_data;
-} Database;
 
 void db_init(void);
 void db_uninit(void);
 void db_create(void);
 
-void db_field_add(void);
-void db_service_add(void);
+// reset database header
+void db_header_begin(void);
+void db_header_add_tag(String name);
+void db_header_add_field(char* name, FieldType type);
+void db_header_add_field_hook_web(char* name, FieldType type, char* dm_url, char* feed_url);
+void db_header_add_field_hook_script(char* name, FieldType type, char* dm_script, char* feed_script);
+void db_header_add_field_hook_program(char* name, FieldType type, char* cmd);
+void db_header_end(void);
+
+// gets the string for the first bit in mask
+char* db_tag_get(Tag bitmask);
+
 
 void db_load(char* filename, String passkey);
 void db_encrypt(String passkey);
 void db_save(char* filename);
-
 void db_contact_add(String id);
+
+u32 db_fields_count(void);
+
 // value is copied, free it on your end
 void db_contact_field_set(String id, FieldId field, void* value, u32 value_size);
+/* void db_contact_field_set(String id, FieldId field, FieldType type, void* value, u32 value_size); */
+void db_contact_field_set_string(String id, FieldId field, String str);
 
+// gets every tag
+Tag  db_contact_tags_get(String id);
 void db_contact_tag_set(String id, Tag tags);
 void db_contact_remove(String name_id);
 
@@ -169,5 +166,10 @@ void db_search_multi(String query, FieldId* fields, u32 field_count);
 
 //------------------------------------------------------------
 
+
+u32 min(u32 a, u32 b);
+u32 max(u32 a, u32 b);
+
+String cstr_to_string(char* str);
 
 #endif
