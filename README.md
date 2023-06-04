@@ -142,17 +142,17 @@ service:
     - set fields
     - create db
     - save db
+    - basic encryption
 # TEST:
     - remove contact
     - request fields
     - add/remove tag names
     - scratch allocator works properly
 # TODO:
+    - load database
     - request particular field
     - search by field
     - search by tag
-    - load database
-    - basic encryption
     - queue fields
 # BUGS:
     - scratch_alloc not working properly

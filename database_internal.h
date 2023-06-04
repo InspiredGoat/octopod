@@ -17,7 +17,6 @@
 
 // 1kb scratch memory
 #define MAX_SCRATCH_SIZE 1024 * 1024
-#define INVALID_INDEX (u32)(-1)
 
 // Database is set up as a structure of arrays
 typedef struct
@@ -63,5 +62,19 @@ StringData* string_to_stringdata(String str);
 String string_copy(String str);
 void fwstring(String str, FILE* file);
 void fwcstring(char* cstr, FILE* file);
+
+void db_read_begin(char* filename, String password);
+// only read after db_read_begin
+void db_read(void* ret_buf, u32 size);
+void db_read_end();
+
+void    db_write_begin(char* filename, String password);
+// only write after db_write_begin
+void    db_write(void* buf, u32 size);
+/* void    db_write_string(void* buf, u32 size); */
+void    db_write_end();
+u32     db_string_hash(String password);
+
+void db_wire_field_data(FieldData* field_data);
 
 #endif

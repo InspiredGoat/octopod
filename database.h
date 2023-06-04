@@ -22,11 +22,12 @@ typedef unsigned char bool;
 
 #define TRUE  1
 #define FALSE 0
+#define INVALID_INDEX (u32)(-1)
 
 #define DB_MAX_CID_STR_SIZE 128
 #define DB_MAX_TAG_STR_SIZE 128
 #define DB_MAX_PWD_STR_SIZE 128
-#define DB_MAX_URL_STR_SIZE 1024
+#define DB_MAX_URL_STR_SIZE 256
 #define DB_MAX_FIELD_STR_SIZE 128
 
 
@@ -146,10 +147,13 @@ char* db_tag_get(Tag bitmask);
 
 void db_load(char* filename, String passkey);
 void db_encrypt(String passkey);
-void db_save(char* filename);
+void db_save(char* filename, String password);
 
-void db_contact_add(String id);
+bool db_contact_add(String id);
 void db_contact_remove(String name_id);
+
+u32 db_contacts_count();
+StringData** db_contacts_ids_tempalloc();
 
 u32 db_fields_count(void);
 
@@ -159,6 +163,7 @@ void db_contact_field_set(String id, FieldId field, void* value, u32 value_size)
 void db_contact_field_set_string(String id, FieldId field, String str);
 
 void db_contact_tag_set(String id, Tag tags);
+String db_contact_id_from_index(u32 index);
 
 Tag db_contact_tag_get(String name_id);
 FieldData* db_contact_field_get_all(String name_id);
@@ -174,5 +179,6 @@ u32 min(u32 a, u32 b);
 u32 max(u32 a, u32 b);
 
 String cstr_to_string(char* str);
+String string_temp_copy(String str);
 
 #endif

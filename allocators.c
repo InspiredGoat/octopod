@@ -10,10 +10,15 @@ void db_scratch_init()
 {
     scratch_off = 0;
     scratch_mem = calloc(MAX_SCRATCH_SIZE, 1);
+    if (scratch_mem == NULL)
+    {
+        printf("NULL SCRATCH!!\n");
+    }
 }
 
 void db_scratch_uninit()
 {
+    scratch_off = 0;
     free(scratch_mem);
 }
 
@@ -32,24 +37,24 @@ void* db_scratch_alloc(u64 size)
         scratch_off += size;
     }
 
-    return scratch_mem + scratch_off;
+    return scratch_mem + (scratch_off - size);
 }
-
 
 // just a bump allocator for now
 static void* arena_mem;
-static void* arena_mem_head;
 static u64   arena_size;
 static u64   arena_capacity;
 
 void db_arena_init(void)
 {
-    arena_mem       = calloc(ARENA_BLOCK_SIZE, 1);
     arena_capacity  = ARENA_BLOCK_SIZE;
+    arena_mem       = calloc(arena_capacity, 1);
     arena_size      = 0;
 }
 void db_arena_uninit(void)
 {
+    arena_capacity  = 0;
+    arena_size      = 0;
     free(arena_mem);
 }
 // returns NULL if size exceeds max scratch size
@@ -57,8 +62,19 @@ void* db_arena_alloc(u64 size)
 {
     if (arena_size + size > arena_capacity)
     {
-        arena_capacity += ARENA_BLOCK_SIZE;   
-        arena_mem = realloc(arena_mem, arena_capacity);
+        void* new_ptr;
+        arena_capacity += arena_size * 2 + size;
+        new_ptr = realloc(arena_mem, arena_capacity);
+
+        if (new_ptr == NULL)
+        {
+            printf("We have a massive problem here\n");
+            assert(0);
+        }
+        else
+        {
+            arena_mem = new_ptr;
+        }
     }
     arena_size += size;
     return arena_mem + (arena_size - size);
