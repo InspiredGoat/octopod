@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <assert.h>
+#include <openssl/sha.h>
 
 #include "database_internal.h"
 

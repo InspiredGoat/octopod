@@ -1,4 +1,4 @@
-# Octopod
+# Octopus
 ## (Taking suggestions for better name)
 
 # ⚠️⚠️ NOT FINISHED USE AT YOUR OWN RISK ⚠️⚠️
@@ -26,7 +26,7 @@ The fastest way to message your someone you know currently is:
 1. remember where to message them
 2. go to app/website
 3. find contact
-4. send message
+4. send messagk
 
 The 1st and 2nd steps add friction to switching between platforms.
 So slowly over time, one site is chosen per "type" of relationship.
