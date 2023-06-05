@@ -1,10 +1,16 @@
-# Octopus
+# 🐙 Octopod 🐙
 ## (Taking suggestions for better name)
 
 # ⚠️⚠️ NOT FINISHED USE AT YOUR OWN RISK ⚠️⚠️
 # ⚠️⚠️ MOST OF THE FOLLOWING SPEC IS SUBJECT TO CHANGE ⚠️⚠️
 
 An encrypted database for contacts with scriptable hooks to social media and other services.
+
+## Basic plan
+3 projects with 3 scopes:
+1. this project: a simple contact database library with tagging and hooks written in C
+2. configurations: settings for interfacing database with proprietary services (so one per service)
+3. the client(s): still undecided if I should make more than one client, but plan is have a very intuitive cross platform database client with all the bells and whistles (Comes with sensible configuration installed) ideally comes bundled as a single executable.
 
 ## Planned Features
 - import contacts from social media (LinkedIn, Twitter, Gmail, etc.)
@@ -43,7 +49,8 @@ Want to message a friend? Here's how:
 2. click message
 3. friend's preferred chat opens with dm ready to go
 
-If this process is faster than .
+If this process is faster than accessing a service normaly then people will not only be more open to new platforms, 
+but they will also prioritize platforms that are highly integrated to this system.
 
 
 In short, some of the benefits:
@@ -51,9 +58,13 @@ In short, some of the benefits:
 - Remove barrier to entry
 - Keep up with
 
-
 ## Current Features
-
+- [X] database create
+- [X] database save
+- [X] database load
+- [X] database basic encryption (can't read fields as plain text)
+- [X] database add tags
+- [X] database add fields
 
 ## Architecture
 
@@ -61,6 +72,8 @@ In short, some of the benefits:
 ## Extending and plugins
 
 ## Config file
+
+Possible config file:
 
 ```
 
@@ -93,14 +106,13 @@ field:
     id: lname
     display_name: Last Name
  
-# services are fields with hooks
-service:
+field:
     id: phone
     display_name: Phone Number
     hook_type: script
     dm_hook
 
-service:
+field:
     id: twitter
     display_name: Twitter
     hook_type: url
@@ -111,21 +123,21 @@ service:
     hook_dm: https://twitter.com/{{cuid}}-{{uid}}
     hook_public: https://twitter.com/{{cuid}}
 
-service:
+field:
     id: facebook
     display_name: Facebook
     hook_type: script
     hook_dm: https://www.facebook.com/messages/t/{{cuid}}/
     hook_public: https://www.facebook.com/profile.php?id={{cuid}}
 
-service:
+field:
     id: whatsapp
     display_name: Whatsapp
     dm_url: https://web.whatsapp.com
     # sadly this is as far as we can go with whatsapp
     pub_url: https://web.whatsapp.com
 
-service:
+field:
     id: urbit
     display_name: Urbit
     # more advanced service logic can be imported through dll extensions
@@ -143,16 +155,15 @@ service:
     - create db
     - save db
     - basic encryption
+    - load database
 # TEST:
     - remove contact
     - request fields
     - add/remove tag names
     - scratch allocator works properly
 # TODO:
-    - load database
     - request particular field
     - search by field
     - search by tag
-    - queue fields
+    - queue fields???
 # BUGS:
-    - scratch_alloc not working properly
